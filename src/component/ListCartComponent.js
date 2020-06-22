@@ -8,9 +8,10 @@ class ListCartComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            cartId:this.props.match.params.cartId,
+            token:props.location.state.token,
+            cartId:props.location.state.cartId,
             totalNumberOfItemsInCart:0.0,
-            totalCartCost:0.0,
+            totalCartCost:props.location.state.totalCartCost,
             productDetails: [],
             message: null
         }
@@ -18,6 +19,7 @@ class ListCartComponent extends Component {
         this.addToCartClicked = this.addToCartClicked.bind(this)
         //this.addCourseClicked = this.addCourseClicked.bind(this)
         this.refreshProductDetails = this.refreshProductDetails.bind(this)
+        this.displayCartItems = this.displayCartItems.bind(this)
     }
 
     componentDidMount() {
@@ -27,7 +29,7 @@ class ListCartComponent extends Component {
    
 
     refreshProductDetails() {
-        CartService.retrieveAllCourses()//HARDCODED
+        CartService.retrieveAllCourses(this.state.token)
             .then(
                 response => {
                     //console.log(response);
@@ -47,21 +49,35 @@ class ListCartComponent extends Component {
     addToCartClicked(id){
         //CartService.retrieveProductById(id)
         console.log('add to cart ' + id)
-        this.props.history.push(`/productDetails/${this.state.cartId}/${id}`)
+        let locationx={
+            pathname:'/productDetails',
+            state:{cartId:(this.state.cartId),token:(this.state.token),productId:(id)}
+        }                       
+      this.props.history.push(locationx)
+        //this.props.history.push(`/productDetails/${this.state.cartId}/${id}`)
+    }
+    displayCartItems(cartId){
+        
+        let locationx={
+            pathname:'/viewCart',
+            state:{cartId:(this.state.cartId),token:(this.state.token),totalCartCost:(this.state.totalCartCost)}
+        }                       
+      this.props.history.push(locationx)
     }
 
    
 
     render() {
-        console.log('render')
+      
         return (
             <div className="container">
                 <h3>Inventory</h3>
                 <div className="row">
-                <label>Total Number of Items Added to Cart : </label>
-                <label>{this.state.totalNumberOfItemsInCart}</label>
+                    <button onClick={() => this.displayCartItems(this.state.cartId)}>Cart Cost ({this.state.totalCartCost})</button>
                 
-            </div>
+                
+                
+                </div>
                 <div className="container">
                     <table className="table">
                         <thead>
@@ -95,6 +111,11 @@ class ListCartComponent extends Component {
                         </tbody>
                     </table>
                    
+                </div>
+                <div className="row">
+                <button>Checkout Cart</button>
+                
+                
                 </div>
                 
            

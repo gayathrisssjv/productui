@@ -7,8 +7,9 @@ class ProductComponent extends Component {
   constructor(props) {
     super(props)
     this.state = {
-        cartId:this.props.match.params.cartId,
-        productid: this.props.match.params.id,
+        cartId:props.location.state.cartId,
+        productid: props.location.state.productId,
+        token:props.location.state.token,
         name:'',
         description: '',
         mrp:0,
@@ -20,10 +21,10 @@ class ProductComponent extends Component {
     this.validate = this.validate.bind(this)
 }
 componentDidMount() {
-    console.log(this.state.id)
+    //console.log(this.state.id)
     // eslint-disable-next-line
    
-    CartService.retrieveProductById(this.state.productid)
+    CartService.retrieveProductById(this.state.productid,this.state.token)
        
         .then(
           response => {
@@ -50,8 +51,18 @@ console.log(cartItemRequest)
 
 
 
-    CartService.retrieveProductById(this.state.id)
-        .then(() => this.props.history.push('/productdetails'))
+    CartService.addCartItem(cartItemRequest,this.state.token)
+        .then(
+            response => {
+                console.log(response);
+                let locationx={
+                    pathname:'/inventory',
+                    state:{cartId:(response.data.shoppingCart.cartId),token:(this.state.token),totalCartCost:(response.data.shoppingCart.totalCost)}
+                }                       
+              this.props.history.push(locationx)
+               // this.props.history.push(`/inventory/${response.data.shoppingCart.cartId}/${response.data.shoppingCart.totalCost}`)
+            }
+        )
 
 
 console.log(values);

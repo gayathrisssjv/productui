@@ -6,7 +6,11 @@ import CartService from '../service/CartService';
 class CartComponent extends Component {
     constructor(props) {
         super(props)
+        
         this.state = {
+            
+            username:props.location.state.username,
+            token:props.location.state.token,
             cartId: 0,
             totalCartCost: 0.0
         }
@@ -17,14 +21,16 @@ class CartComponent extends Component {
     }
      
     componentDidMount() {
-        console.log('') 
+       
     }
    
 
     
     createNewCart() {
-       
-            CartService.createCart()
+        
+            console.log(this.state.username)
+            console.log(this.state.token)
+            CartService.createCart(this.state.username,this.state.token)
                 .then(
                     response => {
                         console.log(response.data);
@@ -32,8 +38,13 @@ class CartComponent extends Component {
                         this.setState({cartId: response.data.cartId })
                        
                         this.setState({totalCartCost: response.data.totalCost })
-                        this.props.history.push(`/inventory/${this.state.cartId}`)
+                        let locationx={
+                            pathname:'/inventory',
+                            state:{cartId:(response.data.cartId),token:(this.state.token),totalCartCost:(response.data.totalCost)}
+                        }                       
+                      this.props.history.push(locationx)
                         
+                        // this.props.history.push(`/inventory/${this.state.cartId}/${this.state.totalCartCost}`)
                     }
                 )
                 //console.log(this.state.cartId)
@@ -44,10 +55,10 @@ class CartComponent extends Component {
    
 
     render() {
-        console.log('render')
+       
         return (
             <div className="container">
-                <h3>Welcome To Grocery Store</h3>
+                <h3>Welcome {this.state.username} To Grocery Store</h3>
                 <button className="btn btn-success" onClick={() => this.createNewCart()}>Let's Get Started</button>
             </div>
         )
